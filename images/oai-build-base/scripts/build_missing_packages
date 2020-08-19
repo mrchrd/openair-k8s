@@ -130,6 +130,14 @@ case "${PLATFORM}" in
         build_install_protobuf
         build_install_protobuf_c
         ;;
+    centos8)
+        (cd /usr/bin && ln -sf python2 python)
+        ;;
+    centos7)
+        (cd /usr/bin && ln -sf cmake3 cmake)
+        build_install_protobuf
+        build_install_protobuf_c
+        ;;
 esac
 build_install_asn1c_oai
 build_install_asn1c_cn
