@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMAGES=$(find images -type f -name Dockerfile | sed 's|images/||g' | sed 's|/Dockerfile||g' | xargs)
+IMAGES=$(find images -type f -name Dockerfile* | sed 's|images/||g' | sed 's|/Dockerfile[a-z0-9.]*||g' | sort | uniq | xargs)
 
 info() {
     local MESSAGE=$1
@@ -22,10 +22,14 @@ available images:
 check_dockerfile() {
     local IMAGE=$1
 
-    info "Checking images/$i/Dockerfile"
-    podman run --rm --privileged -v $PWD:/root/ \
-        projectatomic/dockerfile-lint \
-        dockerfile_lint -f images/$IMAGE/Dockerfile
+    DOCKERFILES=$(find images/$IMAGE -type f -name Dockerfile* | sort | uniq | xargs)
+
+    for i in $DOCKERFILES; do
+        info "Checking $i"
+        podman run --rm --privileged -v $PWD:/root/ \
+            projectatomic/dockerfile-lint \
+            dockerfile_lint -f $i
+    done
 }
 
 # parse command line args

@@ -34,8 +34,8 @@ build_image() {
     # Default to building from Dockerfile. If there's a platform-specific Dockerfile
     # use that instead and append the platform name to the image tag.
     DOCKERFILE="Dockerfile"
-    if [ -f images/$IMAGE/Dockerfile.rh${PLATFORM} ]; then
-        DOCKERFILE="Dockerfile.rh${PLATFORM}"
+    if [ -f images/$IMAGE/Dockerfile.${PLATFORM} ]; then
+        DOCKERFILE="Dockerfile.${PLATFORM}"
         CLEAN_TAG="${CLEAN_TAG}.${PLATFORM}"
     fi
 
@@ -92,8 +92,8 @@ for i in $IMAGES; do
     TAG=${i#*:}
     # if no git_tag specified, grep default from Dockerfile
     if [ "$IMG" = "$TAG" ]; then
-        if [ -f images/$IMG/Dockerfile.rh${PLATFORM} ]; then
-            TAG=$(grep -oP "ARG GIT_TAG=\K[a-zA-Z0-9.-]+" images/$IMG/Dockerfile.rh${PLATFORM} || echo "latest")
+        if [ -f images/$IMG/Dockerfile.${PLATFORM} ]; then
+            TAG=$(grep -oP "ARG GIT_TAG=\K[a-zA-Z0-9.-]+" images/$IMG/Dockerfile.${PLATFORM} || echo "latest")
         else
             TAG=$(grep -oP "ARG GIT_TAG=\K[a-zA-Z0-9.-]+" images/$IMG/Dockerfile || echo "latest")
         fi
