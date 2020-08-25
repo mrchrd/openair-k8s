@@ -2,6 +2,12 @@
 #set -ex
 IMAGES=$(find images -type f -name Dockerfile* | sed 's|images/||g' | sed 's|/Dockerfile[a-z0-9.]*||g' | sort | uniq | xargs)
 
+if ( which docker > /dev/null 2>&1 ) && ( ! which podman > /dev/null 2>&1 ); then
+  DOCKER=${DOCKER:-docker}
+else
+  DOCKER=${DOCKER:-podman}
+fi
+
 IMAGENAME=$1
 TAG=$2
 REGISTRY=$3
@@ -22,14 +28,14 @@ while [[ $# < 3 ]]; do
 done
 
 login_registry() {
-podman login $REGISTRY
+${DOCKER} login $REGISTRY
 }
 
 
 push_image() {
-IMAGEID=$(podman image ls | grep $IMAGENAME | grep $TAG | awk '{print $3}')
+IMAGEID=$(${DOCKER} image ls | grep $IMAGENAME | grep $TAG | awk '{print $3}')
 echo $IMAGEID
-podman push $IMAGEID $REGISTRY
+${DOCKER} push $IMAGEID $REGISTRY
 }
 
 login_registry $REGISTRY

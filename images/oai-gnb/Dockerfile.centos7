@@ -34,9 +34,9 @@ RUN yum install -y epel-release \
 ENV APP_ROOT=/opt/oai-gnb
 ENV PATH=${APP_ROOT}:${PATH} HOME=${APP_ROOT}
 COPY --from=builder /root/openairinterface5g/cmake_targets/ran_build/build/nr-softmodem ${APP_ROOT}/bin/
-COPY --from=builder /root/openairinterface5g/cmake_targets/ran_build/build/*.so* /lib64
+COPY --from=builder /root/openairinterface5g/cmake_targets/ran_build/build/*.so* /lib64/
 COPY --from=builder /usr/local/lib64 /lib64
-COPY --from=builder /usr/local/bin/uhd_* /usr/local/bin
+COPY --from=builder /usr/local/bin/uhd_* /usr/local/bin/
 COPY --from=builder /usr/local/share/uhd /usr/local/share/uhd
 RUN cd /lib64 \
     && ln -sf liboai_eth_transpro.so liboai_transpro.so \
@@ -51,12 +51,18 @@ RUN chmod -R u+x ${APP_ROOT} && \
 USER 10001
 WORKDIR ${APP_ROOT}
 
-EXPOSE 2152/udp  # S1U, GTP/UDP
-EXPOSE 22100/tcp # ?
-EXPOSE 36412/udp # S1C, SCTP/UDP
-EXPOSE 36422/udp # X2C, SCTP/UDP
-EXPOSE 50000/udp # IF5 / ORI (control)
-EXPOSE 50001/udp # IF5 / ECPRI (data)
+# S1U, GTP/UDP
+EXPOSE 2152/udp
+# ?
+EXPOSE 22100/tcp
+# S1C, SCTP/UDP
+EXPOSE 36412/udp
+# X2C, SCTP/UDP
+EXPOSE 36422/udp
+# IF5 / ORI (control)
+EXPOSE 50000/udp
+# IF5 / ECPRI (data)
+EXPOSE 50001/udp
 
 CMD ["/opt/oai-gnb/bin/nr-softmodem", "-O", "/opt/oai-gnb/etc/gnb.conf"]
 ENTRYPOINT ["/opt/oai-gnb/bin/entrypoint.sh"]

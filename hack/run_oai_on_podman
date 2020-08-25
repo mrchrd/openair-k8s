@@ -11,6 +11,12 @@ fi
 DEFAULT_HOST_INTERFACE_NAME=$(ip route get 1.1.1.1 | grep -oP 'dev \K\S+')
 DEFAULT_HOST_INTERFACE_IP=$(ip route get 1.1.1.1 | grep -oP 'src \K\S+')
 
+if ( which docker > /dev/null 2>&1 ) && ( ! which podman > /dev/null 2>&1 ); then
+  DOCKER=${DOCKER:-docker}
+else
+  DOCKER=${DOCKER:-podman}
+fi
+
 info() {
     local MESSAGE=$1
 
@@ -38,7 +44,7 @@ wait_for_state() {
     local TARGET_STATE=${2,,}       # state to waite for ("running", "exited", etc)
     local TIMEOUT=${3:-30}          # timeout (default: 30s)
 
-    until [ "$(podman inspect ${CONTAINER_NAME_OR_ID} -f {{.State.Status}})" == "${TARGET_STATE}" ] || [ $TIMEOUT -le 0 ]; do
+    until [ "$(${DOCKER} inspect ${CONTAINER_NAME_OR_ID} -f {{.State.Status}})" == "${TARGET_STATE}" ] || [ $TIMEOUT -le 0 ]; do
         echo -ne "  Waiting ${TIMEOUT}s for ${CONTAINER_NAME_OR_ID} to transition to state ${TARGET_STATE^^}.\033[0K\r"
         sleep 1;
         (( TIMEOUT-- ))
@@ -71,19 +77,19 @@ run_component() {
     local LIVENESS_IP=${3%:*}
     local LIVENESS_PORT=${3#*:}
 
-    if [ "$(podman ps -a -q -f name=$CONTAINER_NAME)" ]; then
-        if [ "$(podman inspect -f {{.State.Running}} ${CONTAINER_NAME})" == "true" ]; then
+    if [ "$(${DOCKER} ps -a -q -f name=$CONTAINER_NAME)" ]; then
+        if [ "$(${DOCKER} inspect -f {{.State.Running}} ${CONTAINER_NAME})" == "true" ]; then
              info "$CONTAINER_NAME container already running."
              return
         fi
         info "Removing existing $CONTAINER_NAME container."
-        podman rm -f $CONTAINER_NAME 2> /dev/null
+        ${DOCKER} rm -f $CONTAINER_NAME 2> /dev/null
     fi
 
     info "Starting $CONTAINER_NAME container."
     shift 3 # remove image, container name and liveness IP+port from args
-    echo -ne "podman run -d --net=host --name $CONTAINER_NAME $@ $IMAGE\n"
-    podman run -d --net=host --name $CONTAINER_NAME "$@" $IMAGE
+    echo -ne "${DOCKER} run -d --net=host --name $CONTAINER_NAME $@ $IMAGE\n"
+    ${DOCKER} run -d --net=host --name $CONTAINER_NAME "$@" $IMAGE
 
     # block until container is running and service binds to port
     wait_for_state $CONTAINER_NAME "RUNNING"
@@ -132,11 +138,11 @@ if [[ "${COMPONENTS}" =~ "HSS" ]]; then
         -e CASSANDRA_CLUSTER_NAME=OAI_HSS \
         -e CASSANDRA_ENDPOINT_SNITCH="GossipingPropertyFileSnitch" \
         -p 127.0.0.1:9042:9042 
-    CASSANDRA_IP=$(podman exec cassandra ip route get 1.1.1.1 | grep -oP 'src \K\S+')
+    CASSANDRA_IP=$(${DOCKER} exec cassandra ip route get 1.1.1.1 | grep -oP 'src \K\S+')
 
     info 'Provisioning HSS database schema'
     QUERIES=$(<${THIS_SCRIPT_PATH}/db/oai_db.cql)
-    podman run --rm -it cassandra:3.11 cqlsh ${CASSANDRA_IP} -e "${QUERIES}"
+    ${DOCKER} run --rm -it cassandra:3.11 cqlsh ${CASSANDRA_IP} -e "${QUERIES}"
 
     run_component oai-hss_rel14:k8s oai-hss 127.0.0.1:3868 \
         -e DB_FQDN=${CASSANDRA_IP} \
@@ -152,12 +158,12 @@ if [[ "${COMPONENTS}" =~ "HSS" ]]; then
 
     info 'Registering subscriber(s) with HSS'
     QUERIES=$(<${THIS_SCRIPT_PATH}/db/subscribers.cql)
-    podman run --rm -it cassandra:3.11 cqlsh ${CASSANDRA_IP} -e "${QUERIES}"
+    ${DOCKER} run --rm -it cassandra:3.11 cqlsh ${CASSANDRA_IP} -e "${QUERIES}"
 fi
 
 if [[ "${COMPONENTS}" =~ "SPGW" ]]; then
     echo "(not implemented yet)"
-    # Commented due to  podman run --net=host (Same port binding for S11, SX)
+    # Commented due to ${DOCKER} run --net=host (Same port binding for S11, SX)
     #run_component oai-spgwc:develop oai-spgwc 127.0.0.1:2123 \
     #    -e SGW_S11_INTERFACE="$CONTAINER_INTERFACE" \
     #    -e PGW_SX_INTERFACE="$CONTAINER_INTERFACE" \
@@ -165,10 +171,10 @@ if [[ "${COMPONENTS}" =~ "SPGW" ]]; then
     #    -e UE_DNS_SERVER="8.8.8.8" \
     #    -p 2123:2123 -p 8805:8805 \
     #    -h spgwc.openair4G.eur
-    #PGWC_SX_IP_ADDRESS=`sudo podman exec -it oai-spgwc ip -4 addr show  scope global | awk '$1 == "inet" {print $2}' | xargs | cut -d '/' -f1`
-    #SGWC_IP=`sudo podman exec -it oai-spgwc ip -4 addr show  scope global | awk '$1 == "inet" {print $2}' | xargs | cut -d '/' -f1`
+    #PGWC_SX_IP_ADDRESS=`sudo ${DOCKER} exec -it oai-spgwc ip -4 addr show  scope global | awk '$1 == "inet" {print $2}' | xargs | cut -d '/' -f1`
+    #SGWC_IP=`sudo ${DOCKER} exec -it oai-spgwc ip -4 addr show  scope global | awk '$1 == "inet" {print $2}' | xargs | cut -d '/' -f1`
 
-    # Hardcoded due to  podman run --net=host 
+    # Hardcoded due to ${DOCKER} run --net=host 
     # PGWC_SX_IP_ADDRESS="192.168.104.200"
     # SGWC_IP="192.168.104.199"
 
@@ -187,9 +193,9 @@ if [[ "${COMPONENTS}" =~ "MME" ]]; then
 
     info 'Registering MME with HSS'
     QUERIES="INSERT INTO vhss.mmeidentity (idmmeidentity, mmeisdn, mmehost, mmerealm, ue_reachability) VALUES (4, 'mme-isdn', 'mme.openair4G.eur', 'openair4G.eur', 1); INSERT INTO vhss.mmeidentity_host (idmmeidentity, mmeisdn, mmehost, mmerealm, ue_reachability) VALUES (4, 'mme-isdn', 'mme.openair4G.eur', 'openair4G.eur', 1);"
-    podman run --rm -it cassandra:3.11 cqlsh ${CASSANDRA_IP} -e "${QUERIES}"
+    ${DOCKER} run --rm -it cassandra:3.11 cqlsh ${CASSANDRA_IP} -e "${QUERIES}"
 
-    HSS_IP=$(podman exec oai-hss ip route get 1.1.1.1 | grep -oP 'src \K\S+')
+    HSS_IP=$(${DOCKER} exec oai-hss ip route get 1.1.1.1 | grep -oP 'src \K\S+')
     run_component oai-mme:master oai-mme 127.0.0.1:3870 \
         --privileged \
         -e MME_SERVICE="mme.openair4G.eur" \

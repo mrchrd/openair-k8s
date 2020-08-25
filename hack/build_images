@@ -4,9 +4,15 @@ source /etc/os-release
 PLATFORM=${PLATFORM:-${ID#rh*}${VERSION_ID%.*}}
 KERNEL_VERSION=${KERNEL_VERSION:-$(uname -r)}
 KERNEL_VERSION=${KERNEL_VERSION%*.x86_64}
-REGISTRY=${REGISTRY:-registry.redhat.io}
+REGISTRY=${REGISTRY:-localhost}
 BUILD_ARGS=${BUILD_ARGS:-"--no-cache"}
 IMAGES=$(find images -type f -name Dockerfile* | sed 's|images/||g' | sed 's|/Dockerfile[a-z0-9.]*||g' | sort | uniq | xargs)
+
+if ( which docker > /dev/null 2>&1 ) && ( ! which podman > /dev/null 2>&1 ); then
+  DOCKER=${DOCKER:-docker}
+else
+  DOCKER=${DOCKER:-podman}
+fi
 
 info() {
     local MESSAGE=$1
@@ -39,19 +45,19 @@ build_image() {
         CLEAN_TAG="${CLEAN_TAG}.${PLATFORM}"
     fi
 
-    if $(podman image exists $IMAGE:$CLEAN_TAG) && [ ! "$FORCE" = true ]; then
-        info "Skipping existing image $IMAGE:$CLEAN_TAG (use '-f' to override)"
+    if $(${DOCKER} image inspect $REGISTRY/$IMAGE:$CLEAN_TAG >/dev/null 2>&1) && [ ! "$FORCE" = true ]; then
+        info "Skipping existing image $REGISTRY/$IMAGE:$CLEAN_TAG (use '-f' to override)"
     else
-        info "Building image $IMAGE:$CLEAN_TAG"
+        info "Building image $REGISTRY/$IMAGE:$CLEAN_TAG"
 
-        podman image build \
-            --net=host \
+        ${DOCKER} image build \
+            --network=host \
             $BUILD_ARGS \
             --build-arg GIT_TAG=$TAG \
             --build-arg KERNEL_VERSION=$KERNEL_VERSION \
             --build-arg EURECOM_PROXY=$PROXY \
-            -f $DOCKERFILE \
-            -t $IMAGE:$CLEAN_TAG \
+            -f images/$IMAGE/$DOCKERFILE \
+            -t $REGISTRY/$IMAGE:$CLEAN_TAG \
             images/$IMAGE
     fi
 }
@@ -81,7 +87,7 @@ if [ $# -ne 0 ]; then
   IMAGES=$*
 fi
 
-podman login ${REGISTRY}
+${DOCKER} login ${REGISTRY}
 
 IMAGES="oai-build-base ${IMAGES/oai-build-base/}"
 

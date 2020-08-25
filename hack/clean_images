@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if ( which docker > /dev/null 2>&1 ) && ( ! which podman > /dev/null 2>&1 ); then
+  DOCKER=${DOCKER:-docker}
+else
+  DOCKER=${DOCKER:-podman}
+fi
+
 info() {
     local MESSAGE=$1
 
@@ -36,17 +42,17 @@ while [[ $# -gt 0 ]]; do
 done
 
 info "Pruning images"
-podman image prune
+${DOCKER} image prune
 if [ ! "$PRUNE_ONLY" = true ]; then
     if [ "$KEEP_BASE" = true ]; then
         info "Deleting OAI images, except for oai-build-base"
-        podman image rm -f $(podman image list -a | grep -e "^localhost/oai-" | grep -v "oai-build-base" | awk '{print $3}' | xargs)
+        ${DOCKER} image rm -f $(${DOCKER} image list -a | grep -e "^localhost/oai-" | grep -v "oai-build-base" | awk '{print $3}' | xargs)
     else
         info "Deleting OAI images"
-        podman image rm -f $(podman image list -a | grep -e "^localhost/oai-" | awk '{print $3}' | xargs)
+        ${DOCKER} image rm -f $(${DOCKER} image list -a | grep -e "^localhost/oai-" | awk '{print $3}' | xargs)
     fi
     RETRIES=5
-    until ! podman image rm -f $(podman image list -a | grep -e "^<none>" | awk '{print $3}' | xargs) || [ $RETRIES -le 0 ]; do
+    until ! ${DOCKER} image rm -f $(${DOCKER} image list -a | grep -e "^<none>" | awk '{print $3}' | xargs) || [ $RETRIES -le 0 ]; do
         info "Deleting orphaned images ($RETRIES retries left)"
         sleep 1
         (( RETRIES-- ))

@@ -34,9 +34,9 @@ RUN REPOLIST=codeready-builder-for-rhel-8-x86_64-rpms \
 ENV APP_ROOT=/opt/oai-mme
 ENV PATH=${APP_ROOT}:${PATH} HOME=${APP_ROOT}
 COPY --from=builder /root/openair-cn/build/mme/build/mme ${APP_ROOT}/bin/
-COPY --from=builder /usr/local/lib/libfd* /lib64
+COPY --from=builder /usr/local/lib/libfd* /lib64/
 COPY --from=builder /usr/local/lib/freeDiameter/* /usr/local/lib/freeDiameter/
-COPY --from=builder /usr/local/lib/liblfds* /usr/lib64
+COPY --from=builder /usr/local/lib/liblfds* /usr/lib64/
 COPY scripts ${APP_ROOT}/bin/
 COPY configs ${APP_ROOT}/etc/
 RUN chmod -R u+x ${APP_ROOT} && \

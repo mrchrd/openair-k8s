@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if ( which docker > /dev/null 2>&1 ) && ( ! which podman > /dev/null 2>&1 ); then
+  DOCKER=${DOCKER:-docker}
+else
+  DOCKER=${DOCKER:-podman}
+fi
+
 info() {
     local MESSAGE=$1
 
@@ -14,10 +20,10 @@ ONLINE_CORES="$(echo "$(expr $(lscpu --parse | wc -l) - 4)")" # skip headers
 NUM_CYCLICTEST_CORES=${NUM_CYCLICTEST_CORES:-4}
 NUM_STRESS_CORES="$(echo "$(expr $ONLINE_CORES - $NUM_CYCLICTEST_CORES - 2)")" # leave at least 2 cores for system
 
-podman pod create --name cyclictest
+${DOCKER} pod create --name cyclictest
 
 for i in `seq $NUM_STRESS_CORES`; do
-    podman run --rm --cpus 1 --cpuset-cpus="$i" -dt --pod cyclictest docker.io/cscojianzhan/stress
+    ${DOCKER} run --rm --cpus 1 --cpuset-cpus="$i" -dt --pod cyclictest docker.io/cscojianzhan/stress
 done
 
 # wait for containers to be up
@@ -25,6 +31,6 @@ sleep 30
 
 info "Running cyclictest image"
 mkdir /tmp/cyclictest || true
-podman run --rm --privileged --cap-add=SYS_RAWIO --cap-add=SYS_NICE --cap-add=IPC_LOCK -e DURATION=${DURATION} -v /tmp:/tmp -v /dev/cpu_dma_latency:/dev/cpu_dma_latency --cpus ${NUM_CYCLICTEST_CORES} -dt --pod cyclictest docker.io/cscojianzhan/cyclictest
+${DOCKER} run --rm --privileged --cap-add=SYS_RAWIO --cap-add=SYS_NICE --cap-add=IPC_LOCK -e DURATION=${DURATION} -v /tmp:/tmp -v /dev/cpu_dma_latency:/dev/cpu_dma_latency --cpus ${NUM_CYCLICTEST_CORES} -dt --pod cyclictest docker.io/cscojianzhan/cyclictest
 
-info "Tests running. When finished, please check output at /tmp/cyclictest. You can remove the whole testset with: podman pod rm cyclictest --force"
+info "Tests running. When finished, please check output at /tmp/cyclictest. You can remove the whole testset with: ${DOCKER} pod rm cyclictest --force"

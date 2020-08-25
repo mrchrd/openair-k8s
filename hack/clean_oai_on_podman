@@ -1,4 +1,10 @@
 #!/bin/bash
 
-podman rm -f oai-enb-rru oai-enb-rcc oai-spgwu oai-spgwc oai-mme oai-hss cassandra
-# podman rm -f $(podman ps -a -q)
+if ( which docker > /dev/null 2>&1 ) && ( ! which podman > /dev/null 2>&1 ); then
+  DOCKER=${DOCKER:-docker}
+else
+  DOCKER=${DOCKER:-podman}
+fi
+
+${DOCKER} rm -f oai-enb-rru oai-enb-rcc oai-spgwu oai-spgwc oai-mme oai-hss cassandra
+# ${DOCKER} rm -f $(${DOCKER} ps -a -q)

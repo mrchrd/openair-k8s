@@ -2,6 +2,12 @@
 
 IMAGES=$(find images -type f -name Dockerfile* | sed 's|images/||g' | sed 's|/Dockerfile[a-z0-9.]*||g' | sort | uniq | xargs)
 
+if ( which docker > /dev/null 2>&1 ) && ( ! which podman > /dev/null 2>&1 ); then
+  DOCKER=${DOCKER:-docker}
+else
+  DOCKER=${DOCKER:-podman}
+fi
+
 info() {
     local MESSAGE=$1
 
@@ -26,7 +32,7 @@ check_dockerfile() {
 
     for i in $DOCKERFILES; do
         info "Checking $i"
-        podman run --rm --privileged -v $PWD:/root/ \
+        ${DOCKER} run --rm --privileged -v $PWD:/root/ \
             projectatomic/dockerfile-lint \
             dockerfile_lint -f $i
     done

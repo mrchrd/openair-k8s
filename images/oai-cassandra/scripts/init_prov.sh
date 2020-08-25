@@ -1,7 +1,8 @@
 #!/bin/bash
 
+DOCKER=${DOCKER:-podman}
 CASS_CONTAINER_NAME=${CASS_CONTAINER_NAME:-cassandra}
-CASS_CONTAINER_IP=`sudo podman exec -it $CASS_CONTAINER_NAME ip -4 addr show  scope global | awk '$1 == "inet" {print $2}' | xargs | cut -d '/' -f1`
+CASS_CONTAINER_IP=`sudo ${DOCKER} exec -it $CASS_CONTAINER_NAME ip -4 addr show  scope global | awk '$1 == "inet" {print $2}' | xargs | cut -d '/' -f1`
 SCRIPT=$(readlink -f $0)
 THIS_SCRIPT_PATH=`dirname $SCRIPT`
 CQL_FILE=$THIS_SCRIPT_PATH/../db/oai_db.cql
@@ -53,4 +54,4 @@ info "container-name:  $CASS_CONTAINER_NAME"
 info "ip:              $CASS_CONTAINER_IP"
 info "cql-file:        $CQL_FILE"
 CQL="`cat $CQL_FILE`"
-sudo podman exec -it  $CASS_CONTAINER_NAME cqlsh $CASS_CONTAINER_IP -e "$CQL"
+sudo ${DOCKER} exec -it  $CASS_CONTAINER_NAME cqlsh $CASS_CONTAINER_IP -e "$CQL"
