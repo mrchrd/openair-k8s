@@ -21,6 +21,7 @@ RUN yum install -y centos-release-scl epel-release \
         check \
         check-devel \
         elfutils-libelf-devel \
+        fmt-devel \
         gflags-devel \
         glog-devel \
         gmp-devel \

@@ -12,7 +12,7 @@ function build_install_asn1c_oai {
     rm -rf /tmp/asn1c_oai
     git clone https://gitlab.eurecom.fr/oai/asn1c.git /tmp/asn1c_oai
     cd /tmp/asn1c_oai
-    git checkout 0a7524184f16e7093990a31d8d4db487a16e5782
+    git checkout velichkov_s1ap_plus_option_group_plus_adding_trailing_ull
     autoreconf -iv
     ./configure --program-suffix=_oai
     make -j`nproc`
@@ -34,7 +34,7 @@ function build_install_uhd {
     rm -rf /tmp/uhd
     git clone https://github.com/EttusResearch/uhd.git /tmp/uhd
     cd /tmp/uhd
-    git checkout tags/v3.13.1.0
+    git checkout tags/v3.15.0.0
     mkdir -p host/build
     cd host/build
     cmake ../
@@ -77,8 +77,8 @@ function build_install_double-conversion {
 
 function build_install_folly {
     rm -rf /tmp/folly
-    git clone --depth=1 --branch=v2019.06.17.00 https://github.com/facebook/folly.git /tmp/folly
-    git clone --depth=1 --branch=release-1.8.0 https://github.com/google/googletest.git /tmp/folly/folly/test/gtest
+    git clone --depth=1 --branch=v2020.08.24.00 https://github.com/facebook/folly.git /tmp/folly
+    git clone --depth=1 --branch=release-1.10.0 https://github.com/google/googletest.git /tmp/folly/folly/test/gtest
     cd /tmp/folly
     patch -p1 < ${SCRIPT_DIR}/../patches/folly-gflagslib-fix.patch
     mkdir -p _build
@@ -90,7 +90,7 @@ function build_install_folly {
 
 function build_install_libuv {
     rm -rf /tmp/libuv
-    git clone --depth=1 --branch=v1.23.1 https://github.com/libuv/libuv.git /tmp/libuv
+    git clone --depth=1 --branch=v1.39.0 https://github.com/libuv/libuv.git /tmp/libuv
     cd /tmp/libuv
     mkdir -p build
     cd build
@@ -101,7 +101,7 @@ function build_install_libuv {
 
 function build_install_protobuf {
     rm -rf /tmp/protobuf
-    git clone --depth=1 --branch=v3.3.0 https://github.com/protocolbuffers/protobuf.git /tmp/protobuf
+    git clone --depth=1 --branch=v3.13.0 https://github.com/protocolbuffers/protobuf.git /tmp/protobuf
     cd /tmp/protobuf
     git submodule update --init --recursive
     ./autogen.sh
@@ -113,7 +113,7 @@ function build_install_protobuf {
 function build_install_protobuf_c {
     export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
     rm -rf /tmp/protobuf-c
-    git clone --depth=1 --branch=v1.3.0 https://github.com/protobuf-c/protobuf-c.git /tmp/protobuf-c
+    git clone --depth=1 --branch=v1.3.3 https://github.com/protobuf-c/protobuf-c.git /tmp/protobuf-c
     cd /tmp/protobuf-c
     ./autogen.sh
     ./configure
