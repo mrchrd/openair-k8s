@@ -1,14 +1,13 @@
 ARG REGISTRY=localhost
 FROM $REGISTRY/oai-build-base:latest.centos8 AS builder
 
-ARG GIT_TAG=develop-vco3
+ARG GIT_TAG=develop
 
 WORKDIR /root
 
 RUN git clone --depth=1 --branch=$GIT_TAG https://github.com/OPENAIRINTERFACE/openair-cn.git
 COPY patches patches/
-RUN patch -p1 -d openair-cn < patches/enable_sudo-less_build.patch \
-    && patch -p1 -d openair-cn < patches/disable_distro_check_and_rpm_install.patch
+RUN patch -p1 -d openair-cn < patches/disable_distro_check_and_rpm_install.patch
 RUN cd openair-cn/scripts \
     && ln -sf /usr/local/bin/asn1c_cn /usr/local/bin/asn1c \
     && ln -sf /usr/local/share/asn1c_cn /usr/local/share/asn1c \

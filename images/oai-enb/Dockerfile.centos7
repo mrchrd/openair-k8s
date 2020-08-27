@@ -1,7 +1,7 @@
 ARG REGISTRY=localhost
 FROM $REGISTRY/oai-build-base:latest.centos7 AS builder
 
-ARG GIT_TAG=v1.1.1
+ARG GIT_TAG=v1.2.2
 
 WORKDIR /root
 

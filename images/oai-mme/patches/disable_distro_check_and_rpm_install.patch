@@ -1,10 +1,10 @@
 diff --git a/build/tools/build_helper.fd b/build/tools/build_helper.fd
-index 0be2a8b7..74e9adbe 100644
+index 4a6f77ac..350679b4 100644
 --- a/build/tools/build_helper.fd
 +++ b/build/tools/build_helper.fd
-@@ -355,29 +355,29 @@ install_opencoord.org_freediameter() {
-   fi
+@@ -139,29 +139,29 @@ install_1.1.5_freediameter_from_source() {
  
+   echo "Install freeDiameter 1.1.5 from source"
    # libpq-dev 'may' be not needed
 -  $SUDO apt-get install $OPTION \
 -    autoconf  \
@@ -52,9 +52,9 @@ index 0be2a8b7..74e9adbe 100644
 +#    python-dev \
 +#    ssl-cert \
 +#    swig
+   ret=$?;[[ $ret -ne 0 ]] && return $ret
  
    if [[ $prompt =~ [yY](es)* ]]
-   then
 diff --git a/scripts/build_mme b/scripts/build_mme
 index ca64459d..3201eb0a 100755
 --- a/scripts/build_mme

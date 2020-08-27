@@ -1,3 +1,5 @@
+diff --git a/build/hss_rel14/Makefile b/build/hss_rel14/Makefile
+index c82c5c37..af736b71 100755
 --- a/build/hss_rel14/Makefile
 +++ b/build/hss_rel14/Makefile
 @@ -22,7 +22,7 @@ LFLAGS := -g -pthread -lpthread -Wl,-rpath,/usr/local/lib/x86_64-linux-gnu:/usr/
@@ -9,6 +11,8 @@
   /usr/local/lib/libfdcore.so \
   /usr/local/lib/libfdproto.so \
   -L/usr/local/lib/x86_64-linux-gnu \
+diff --git a/src/hss_rel14/Makefile b/src/hss_rel14/Makefile
+index 9d6f2434..ba4b8e66 100644
 --- a/src/hss_rel14/Makefile
 +++ b/src/hss_rel14/Makefile
 @@ -14,7 +14,7 @@ LFLAGS := -g -pthread -lpthread -Wl,-rpath,/usr/local/lib/x86_64-linux-gnu:/usr/

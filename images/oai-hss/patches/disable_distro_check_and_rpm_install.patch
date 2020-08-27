@@ -1,3 +1,5 @@
+diff --git a/scripts/build_hss_rel14 b/scripts/build_hss_rel14
+index 919b08cd..3a751b12 100755
 --- a/scripts/build_hss_rel14
 +++ b/scripts/build_hss_rel14
 @@ -121,10 +121,11 @@ function main()
