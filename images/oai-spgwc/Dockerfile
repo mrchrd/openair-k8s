@@ -7,7 +7,6 @@ WORKDIR /root
 
 RUN git clone --depth=1 --branch=$GIT_TAG https://github.com/OPENAIRINTERFACE/openair-cn-cups.git
 RUN git clone --depth=1 --branch=master https://github.com/gabime/spdlog.git openair-cn-cups/build/ext/spdlog
-COPY patches patches/
 RUN cd openair-cn-cups/build/scripts \
     && ./build_spgwc -c -v -b RelWithDebInfo -j
 
