@@ -4,7 +4,6 @@ source /etc/os-release
 PLATFORM=${PLATFORM:-${ID#rh*}}
 KERNEL_VERSION=${KERNEL_VERSION:-$(uname -r)}
 KERNEL_VERSION=${KERNEL_VERSION%*.x86_64}
-REGISTRY=${REGISTRY:-localhost}
 BUILD_ARGS=${BUILD_ARGS:-"--no-cache"}
 IMAGES=$(find images -type f -name Dockerfile* | sed 's|images/||g' | sed 's|/Dockerfile[a-z0-9.]*||g' | sort | uniq | xargs)
 
@@ -12,6 +11,12 @@ if ( which docker > /dev/null 2>&1 ) && ( ! which podman > /dev/null 2>&1 ); the
   DOCKER=${DOCKER:-docker}
 else
   DOCKER=${DOCKER:-podman}
+fi
+
+if [ "${ID#rh*}" == "el" ]; then
+  REGISTRY=${REGISTRY:-registry.redhat.io}
+else
+  REGISTRY=${REGISTRY:-localhost}
 fi
 
 info() {
