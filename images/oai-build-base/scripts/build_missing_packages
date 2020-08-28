@@ -99,46 +99,8 @@ function build_install_libuv {
     make install
 }
 
-function build_install_protobuf {
-    rm -rf /tmp/protobuf
-    git clone --depth=1 --branch=v3.13.0 https://github.com/protocolbuffers/protobuf.git /tmp/protobuf
-    cd /tmp/protobuf
-    git submodule update --init --recursive
-    ./autogen.sh
-    ./configure
-    make -j`nproc`
-    make install
-}
+(cd /usr/bin && ln -sf python2 python)
 
-function build_install_protobuf_c {
-    export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
-    rm -rf /tmp/protobuf-c
-    git clone --depth=1 --branch=v1.3.3 https://github.com/protobuf-c/protobuf-c.git /tmp/protobuf-c
-    cd /tmp/protobuf-c
-    ./autogen.sh
-    ./configure
-    make -j`nproc`
-    make install
-}
-
-case "${PLATFORM}" in
-    el8)
-        (cd /usr/bin && ln -sf python2 python)
-        ;;
-    el7)
-        (cd /usr/bin && ln -sf cmake3 cmake)
-        build_install_protobuf
-        build_install_protobuf_c
-        ;;
-    centos8)
-        (cd /usr/bin && ln -sf python2 python)
-        ;;
-    centos7)
-        (cd /usr/bin && ln -sf cmake3 cmake)
-        build_install_protobuf
-        build_install_protobuf_c
-        ;;
-esac
 build_install_asn1c_oai
 build_install_asn1c_cn
 build_install_uhd
