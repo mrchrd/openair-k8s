@@ -5,7 +5,7 @@ FROM $REGISTRY/centos:8
 
 ARG GIT_TAG=latest
 LABEL name="oai-build-base" \
-      version="${GIT_TAG}.centos8" \
+      version="${GIT_TAG}.centos" \
       io.k8s.description="Image containing all build dependencies for openairinterface5g and openair-cn."
 
 WORKDIR /root

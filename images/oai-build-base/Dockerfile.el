@@ -5,7 +5,7 @@ FROM $REGISTRY/ubi8/ubi
 
 ARG GIT_TAG=latest
 LABEL name="oai-build-base" \
-      version="${GIT_TAG}.el8" \
+      version="${GIT_TAG}.el" \
       io.k8s.description="Image containing all build dependencies for openairinterface5g and openair-cn."
 
 WORKDIR /root

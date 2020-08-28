@@ -1,5 +1,5 @@
 ARG REGISTRY=localhost
-FROM $REGISTRY/oai-build-base:latest.el8 AS builder
+FROM $REGISTRY/oai-build-base:latest.el AS builder
 
 ARG GIT_TAG=v1.2.2
 
