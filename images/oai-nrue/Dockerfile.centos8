@@ -41,7 +41,7 @@ COPY --from=builder /usr/local/share/uhd /usr/local/share/uhd
 RUN cd /lib64 \
     && ln -sf liboai_eth_transpro.so liboai_transpro.so \
     && ln -sf liboai_usrpdevif.so liboai_device.so \
-    && ln -sf libuhd.so.3.15 libuhd.so.3 \
+    && ln -sf libuhd.so.3.13 libuhd.so.3 \
     && ln -sf libuhd.so.3 libuhd.so
 COPY scripts ${APP_ROOT}/bin/
 RUN chmod -R u+x ${APP_ROOT} && \
