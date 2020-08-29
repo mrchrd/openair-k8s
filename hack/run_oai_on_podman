@@ -3,7 +3,7 @@ set -x
 source /etc/os-release
 THIS_SCRIPT_PATH=$(dirname $(readlink -f $0))
 REGISTRY=${REGISTRY:-registry.redhat.io}
-PLATFORM=${PLATFORM:-${ID#rh*}${VERSION_ID%.*}}
+PLATFORM=${PLATFORM:-${ID#rh*}8}
 IS_RT_CAPABLE="false"
 if uname -v | grep -q PREEMPT; then
     IS_RT_CAPABLE="true"
@@ -226,7 +226,7 @@ if [[ "${COMPONENTS}" =~ "RCC" ]]; then
     if [[ "$IS_RT_CAPABLE" == "false" ]]; then
         CPU_RT_PARAMS="--cpu-rt-period 1000 --cpu-rt-runtime 950" # allocate 95% of a 1ms period to rt tasks
     fi
-    run_component oai-enb:1.1.0.${PLATFORM} oai-enb-rcc 127.0.0.1:2152 \
+    run_component oai-enb:1.2.2.${PLATFORM} oai-enb-rcc 127.0.0.1:2152 \
         ${CPU_RT_PARAMS} \
         --privileged \
         --cap-add=SYS_NICE \
@@ -254,7 +254,7 @@ if [[ "${COMPONENTS}" =~ "eNB+UE" ]]; then
     if [[ "$IS_RT_CAPABLE" == "false" ]]; then
         CPU_RT_PARAMS="--cpu-rt-period=1000 --cpu-rt-runtime=950" # allocate 95% of a 1ms period to rt tasks
     fi
-    run_component oai-enb:1.1.0.${PLATFORM} oai-enb-rcc 127.0.0.1:2152 \
+    run_component oai-enb:1.2.2.${PLATFORM} oai-enb-rcc 127.0.0.1:2152 \
         ${CPU_RT_PARAMS} \
         --cap-add=SYS_NICE \
         -e MODE="RCC" \
@@ -275,7 +275,7 @@ if [[ "${COMPONENTS}" =~ "eNB+UE" ]]; then
         -e RU_REMOTE_IP="127.0.0.1" \
         -p 2152:2152 -p 36412:36412 -p 36422:36422 -p 50000:50000 -p 50001:50001
 
-    run_component oai-ue:1.1.0.${PLATFORM} oai-ue 127.0.0.1:2152 \
+    run_component oai-ue:1.2.2.${PLATFORM} oai-ue 127.0.0.1:2152 \
         ${CPU_RT_PARAMS} \
         --cap-add=SYS_NICE \
         -e RU_LOCAL_IF="lo" \
@@ -285,7 +285,7 @@ if [[ "${COMPONENTS}" =~ "eNB+UE" ]]; then
 fi
 
 if [[ "${COMPONENTS}" =~ "GNB" ]]; then
-    run_component oai-gnb:develop-nr.${PLATFORM} oai-gnb 127.0.0.1:2152 \
+    run_component oai-gnb:develop.${PLATFORM} oai-gnb 127.0.0.1:2152 \
         --privileged --cap-add=SYS_RAWIO --cap-add=SYS_NICE --cap-add=IPC_LOCK \
         --device=/dev/cpu_dma_latency:/dev/cpu_dma_latency \
         -e GNB_ID="0xe00" \
@@ -306,7 +306,7 @@ if [[ "${COMPONENTS}" =~ "GNB" ]]; then
 fi
 
 if [[ "${COMPONENTS}" =~ "NR-UE" ]]; then
-    run_component oai-nrue:develop-nr.${PLATFORM} oai-nrue 127.0.0.1:2152 \
+    run_component oai-nrue:develop.${PLATFORM} oai-nrue 127.0.0.1:2152 \
         --privileged --cap-add=SYS_RAWIO --cap-add=SYS_NICE --cap-add=IPC_LOCK \
         --device=/dev/cpu_dma_latency:/dev/cpu_dma_latency \
         -e GNB_ID=42 \
