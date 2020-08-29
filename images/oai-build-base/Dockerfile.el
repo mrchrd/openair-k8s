@@ -67,7 +67,7 @@ RUN yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.n
         python2-requests \
         vim-common \
         xforms \
-        xforms-devel
+        xforms-devel \
         xz-devel \
         zlib-devel \
     && yum clean all -y \
