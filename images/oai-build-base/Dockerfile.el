@@ -9,7 +9,9 @@ LABEL name="oai-build-base" \
       io.k8s.description="Image containing all build dependencies for openairinterface5g and openair-cn."
 
 WORKDIR /root
-RUN yum -y install --enablerepo="codeready-builder-for-rhel-8-x86_64-rpms" \
+
+RUN yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm \
+    && yum -y install --enablerepo="codeready-builder-for-rhel-8-x86_64-rpms" \
         git make cmake gcc gcc-c++ autoconf automake bc bison flex libtool patch \
         atlas-devel \
         blas \
@@ -20,6 +22,8 @@ RUN yum -y install --enablerepo="codeready-builder-for-rhel-8-x86_64-rpms" \
         check \
         check-devel \
         elfutils-libelf-devel \
+        fmt \
+        fmt-devel \
         gflags-devel \
         glog-devel \
         gmp-devel \
@@ -62,10 +66,10 @@ RUN yum -y install --enablerepo="codeready-builder-for-rhel-8-x86_64-rpms" \
         python2-docutils \
         python2-requests \
         vim-common \
+        xforms \
+        xforms-devel
         xz-devel \
         zlib-devel \
-    && yum install -y http://download-ib01.fedoraproject.org/pub/epel/7/x86_64/Packages/x/xforms-1.2.4-5.el7.x86_64.rpm \
-    && yum install -y http://download-ib01.fedoraproject.org/pub/epel/7/x86_64/Packages/x/xforms-devel-1.2.4-5.el7.x86_64.rpm \
     && yum clean all -y \
     && rm -rf /var/cache/yum \
     && pip2 install --user mako pexpect

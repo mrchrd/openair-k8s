@@ -22,6 +22,7 @@ RUN yum -y install epel-release \
         check \
         check-devel \
         elfutils-libelf-devel \
+        fmt \
         fmt-devel \
         gflags-devel \
         glog-devel \
@@ -65,6 +66,7 @@ RUN yum -y install epel-release \
         python2-docutils \
         python2-requests \
         vim-common \
+        xforms \
         xforms-devel \
         xz-devel \
         zlib-devel \
