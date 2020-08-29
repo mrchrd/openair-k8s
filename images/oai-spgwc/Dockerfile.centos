@@ -1,5 +1,5 @@
 ARG REGISTRY=localhost
-FROM $REGISTRY/oai-build-base:latest.centos AS builder
+FROM $REGISTRY/oai-build-base:latest.centos8 AS builder
 
 ARG GIT_TAG=develop
 

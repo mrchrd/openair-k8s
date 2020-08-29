@@ -1,5 +1,5 @@
 ARG REGISTRY=localhost
-FROM $REGISTRY/oai-build-base:latest.el AS builder
+FROM $REGISTRY/oai-build-base:latest.el8 AS builder
 
 ARG GIT_TAG=v1.2.2
 
@@ -9,7 +9,7 @@ RUN if [ "$EURECOM_PROXY" == true ]; then git config --global http.proxy http://
 RUN git clone --depth=1 --branch=$GIT_TAG https://gitlab.eurecom.fr/oai/openairinterface5g.git
 COPY patches patches/
 RUN patch -p1 -d openairinterface5g < patches/disable_building_nasmesh_and_rbtool.patch \
-    && patch -p1 -d openairinterface5g < patches.el_support_ue_ip_module.patch
+    && patch -p1 -d openairinterface5g < patches/el8_support_ue_ip_module.patch
 RUN cd openairinterface5g/cmake_targets \
     && ln -sf /usr/local/bin/asn1c_oai /usr/local/bin/asn1c \
     && ln -sf /usr/local/share/asn1c_oai /usr/local/share/asn1c \
