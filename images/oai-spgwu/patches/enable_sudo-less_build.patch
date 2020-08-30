@@ -7,7 +7,7 @@ index d689501..31e75b9 100644
  esac
  
 -IS_CONTAINER=`egrep -c "docker|kubepods" /proc/self/cgroup`
-+IS_CONTAINER=`egrep -c "docker|kubepods|libpod" /proc/self/cgroup`
++IS_CONTAINER=`egrep -c "buildah|docker|kubepods|libpod" /proc/self/cgroup`
  
  if [ $IS_CONTAINER -eq 0 ]
  then

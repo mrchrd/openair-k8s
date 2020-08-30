@@ -7,7 +7,7 @@ index 23c55f1b..3e48bcc2 100644
  esac
  
 -IS_CONTAINER=`egrep -c "docker|kubepods" /proc/self/cgroup`
-+IS_CONTAINER=`egrep -c "docker|kubepods|libpod" /proc/self/cgroup`
++IS_CONTAINER=`egrep -c "buildah|docker|kubepods|libpod" /proc/self/cgroup`
  
  if [ $IS_CONTAINER -eq 0 ]
  then
@@ -20,7 +20,7 @@ index bec9d6e6..38703bde 100755
  openssl ca -cert cacert.pem -keyfile cakey.pem -in $HOST.csr.pem -out $HOST.cert.pem -outdir . -batch
  
 -IS_CONTAINER=`egrep -c "docker|kubepods" /proc/self/cgroup`
-+IS_CONTAINER=`egrep -c "docker|kubepods|libpod" /proc/self/cgroup`
++IS_CONTAINER=`egrep -c "buildah|docker|kubepods|libpod" /proc/self/cgroup`
  
  if [ $IS_CONTAINER -eq 0 ]
  then
