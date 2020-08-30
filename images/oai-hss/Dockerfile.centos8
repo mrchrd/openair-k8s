@@ -7,7 +7,8 @@ WORKDIR /root
 
 RUN git clone --depth=1 --branch=$GIT_TAG https://github.com/OPENAIRINTERFACE/openair-cn.git
 COPY patches patches/
-RUN patch -p1 -d openair-cn < patches/disable_distro_check_and_rpm_install.patch \
+RUN patch -p1 -d openair-cn < patches/enable_sudo-less_build.patch \
+    && patch -p1 -d openair-cn < patches/disable_distro_check_and_rpm_install.patch \
     && patch -p1 -d openair-cn < patches/fix_libpistache_lib_path.patch
 RUN cd openair-cn/scripts \
     && ln -sf /usr/local/bin/asn1c_cn /usr/local/bin/asn1c \

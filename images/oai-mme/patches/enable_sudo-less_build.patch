@@ -1,0 +1,26 @@
+diff --git a/build/tools/build_helper b/build/tools/build_helper
+index 23c55f1b..3e48bcc2 100644
+--- a/build/tools/build_helper
++++ b/build/tools/build_helper
+@@ -38,7 +38,7 @@ case "$OS_DISTRO" in
+   ubuntu) OS_BASEDISTRO="debian"; INSTALLER="apt-get"; CMAKE="cmake" ;;
+ esac
+ 
+-IS_CONTAINER=`egrep -c "docker|kubepods" /proc/self/cgroup`
++IS_CONTAINER=`egrep -c "docker|kubepods|libpod" /proc/self/cgroup`
+ 
+ if [ $IS_CONTAINER -eq 0 ]
+ then
+diff --git a/src/hss_rel14/bin/make_certs.sh b/src/hss_rel14/bin/make_certs.sh
+index bec9d6e6..38703bde 100755
+--- a/src/hss_rel14/bin/make_certs.sh
++++ b/src/hss_rel14/bin/make_certs.sh
+@@ -44,7 +44,7 @@ openssl genrsa -out $HOST.key.pem 1024
+ openssl req -new -batch -out $HOST.csr.pem -key $HOST.key.pem -subj /CN=$HOST.$DOMAIN/C=FR/ST=BdR/L=Aix/O=fD/OU=Tests
+ openssl ca -cert cacert.pem -keyfile cakey.pem -in $HOST.csr.pem -out $HOST.cert.pem -outdir . -batch
+ 
+-IS_CONTAINER=`egrep -c "docker|kubepods" /proc/self/cgroup`
++IS_CONTAINER=`egrep -c "docker|kubepods|libpod" /proc/self/cgroup`
+ 
+ if [ $IS_CONTAINER -eq 0 ]
+ then
